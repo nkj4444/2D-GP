@@ -1,7 +1,7 @@
 LEFT_RUN= 0
-RIGHT_RUN,
-LEFT_STAND,
-RIGHT_STAND
+RIGHT_RUN = 1
+LEFT_STAND = 2
+RIGHT_STAND = 3
 
 
 def handle_left_run(self):
@@ -14,11 +14,11 @@ def handle_left_run(self):
         self.state = self.LEFT_STAND
         self.stand_frames = 0
 
-def handle_left_statnd(self):
+def handle_left_stand(self):
     self.stand_frames += 1
     if self.stand_frames == 50:
         self.state = self.LEFT_RUN
-        self,run_frames = 0
+        self.run_frames = 0
 
 def handle_right_run(self):
     self.x += 5
@@ -31,16 +31,16 @@ def handle_right_run(self):
         self.stand_frames = 0
 
 
-def handle_right_statnd(self):
+def handle_right_stand(self):
     self.stand_frames += 1
     if self.stand_frames == 50:
         self.state = self.RIGHT_RUN
-        self,run_frames = 0
+        self.run_frames = 0
 handle_state = {
     LEFT_RUN: handle_left_run,
     RIGHT_RUN: handle_right_run,
-    LEFT_STAND: handle_left_statnd,
-    RIGHT_STAND: handle_right_statnd
+    LEFT_STAND: handle_left_stand,
+    RIGHT_STAND: handle_right_stand
 }
 def updaate(self):
     self.frame = (self.frame + 1) % 8
