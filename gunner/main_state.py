@@ -4,15 +4,32 @@ import game_framework
 import numbers
 
 
-
 open_canvas()
 running = True
-
+move6_1, move8_1,move4_1,move2_1,move7_1,move9_1,move1_1,move3_1,move6_2, move8_2,move4_2,move2_2,move7_2,move9_2,move1_2,move3_2 = False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
 move = False
-x = 60
-y = 190
 
+gunnerX = 60
+gunnerY = 190
 turn = 1
+
+w = 20
+h = 10
+#왜인진 모르겠으나 범위를 넓게 잡지 않으면 리스트를 벗어난다는 오류가 뜬다
+maprect = [[to_sdl_rect(0,0,100,100) for col in range(w)] for row in range(h)]
+
+
+for i in range(h):
+    for j in range(w):
+        maprect[i][j] = to_sdl_rect(i * 100, j * 100, 100, 100)
+
+
+"""
+player_position_matrix = [[0 for col in range(w)] for row in range(h)]
+player_position = player_position_matrix[0][1]
+"""
+P_x = 0
+P_y = 1
 
 events = get_events()
 
@@ -21,6 +38,8 @@ def handle_events():
     global x
     global y
     global move
+    global move6_1, move8_1,move4_1,move2_1,move7_1,move9_1,move1_1,move3_1,move6_2, move8_2,move4_2,move2_2,move7_2,move9_2,move1_2,move3_2
+    global rect1
 
     events = get_events()
     for event in events:
@@ -29,22 +48,29 @@ def handle_events():
             running = False
         elif event.type == SDL_KEYDOWN and event.key == SDLK_ESCAPE:
             running = False
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_SPACE:
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_SPACE and turn == 1:
             turn_change()
-        elif event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT:
+        elif event.type == SDL_KEYDOWN and event.key == SDLK_RIGHT and turn == 1:
             turn_change()
 
 
 
 
-        elif event.type == SDL_MOUSEBUTTONDOWN:
+        elif event.type == SDL_MOUSEBUTTONDOWN and turn == 1:
             if event.x > 50 and event.x <150 and event.y > 235 and event.y < 265:
-
                 move = True
             elif event.x > 50 and event.x < 150 and event.y > 135 and event.y < 165:
                 turn_change()
-# 마우스 버튼이 눌릴 좌표를 확인해서 이벤트에 if로 넣어 버리면 부분 클릭 가능
+        elif event.type == SDL_MOUSEBUTTONUP and turn ==1 and move == True:
+            if event.x > maprect[P_x+1][P_y].x and event.x < maprect[P_x+2][P_y].x:# and event.y > maprect[P_x+1][P_y+1].y and event.y < maprect[P_x+1][P_y].y:#event.x < gunnerX + 140 and event.x > gunnerX +43 and event.y > gunnerY + 220 and event.y < gunnerY + 320:
+                move6_1 = True
+            elif event.x < gunnerX + 40 and event.x > gunnerX -40 and event.y > gunnerY + 110 and event.y < gunnerY + 210:
+                move8_1 = True
+            elif event.x < gunnerX + 40 and event.x > gunnerX -40 and event.y > gunnerY + 310 and event.y < gunnerY + 410:
+                move2_1 = True
 
+# 마우스 버튼이 눌릴 좌표를 확인해서 이벤트에 if로 넣어 버리면 부분 클릭 가능
+# 마우스 이벤트의 Y 좌표는 화면 꼭대기에서 시작하므로 gunnerY에다가 220을 더해야 쓸 수 있음
 
 
 
@@ -59,6 +85,7 @@ def turn_change():
         turn = 2
     elif turn == 2:
         turn = 1
+
 #턴은 3 까지 해서 1 = 플레이어, 2 = 적ai, 3 = 움직임 이렇게 해야 할듯
 
 class UserInterface:
@@ -74,13 +101,12 @@ class UserInterface:
         ##(x가시작되는위치,y가시작되는위치,표시할넓이,표시할높이,x좌표,y좌표,x축스케일,y축스케일)
 
 class Gunner:
-   global x
-   global y
+
    def __init__(self):
        self.image = load_image('gunner.png')
 
    def draw(self):
-       self.image.draw(x, y)
+       self.image.draw(gunnerX, gunnerY)
 
 
 class Ground:
@@ -97,18 +123,33 @@ class Ground:
 gunner = Gunner()
 UI = UserInterface()
 ground = Ground()
-rect = draw_rectangle(200,200,200,200)
 
 while running == True:
 
-    if x > 500:
-        x = 200
+
 
 
     if turn == 2 and move == True:
-        x = x + 100
-        move = False
+
+        if move6_1 == True:
+            gunnerX = gunnerX + 100
+            P_x = P_x + 1
+            move6_1 = False
+            move = False
+        elif move8_1 == True:
+            gunnerY = gunnerY + 100
+            P_y = P_y + 1
+            move8_1 = False
+            move = False
+
+
+
+
+
 # 움직임 테스트용 move가 True인 상태에서 턴이 2(행동턴인 3으로 바꿔야함)가 되면
+
+
+
 # 플레이어의 위치를 이동시키고 move를 False로 변경
     if turn == 1:
         handle_events()
