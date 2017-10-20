@@ -14,7 +14,7 @@ gunnerY = 190
 turn = 1
 
 w = 20
-h = 10
+h = 12
 #왜인진 모르겠으나 범위를 넓게 잡지 않으면 리스트를 벗어난다는 오류가 뜬다
 maprect = [[to_sdl_rect(0,0,100,100) for col in range(w)] for row in range(h)]
 
@@ -57,17 +57,30 @@ def handle_events():
 
 
         elif event.type == SDL_MOUSEBUTTONDOWN and turn == 1:
+            print(P_x,P_y)
+
+
             if event.x > 50 and event.x <150 and event.y > 235 and event.y < 265:
                 move = True
             elif event.x > 50 and event.x < 150 and event.y > 135 and event.y < 165:
                 turn_change()
         elif event.type == SDL_MOUSEBUTTONUP and turn ==1 and move == True:
-            if event.x > maprect[P_x+1][P_y].x and event.x < maprect[P_x+2][P_y].x:# and event.y > maprect[P_x+1][P_y+1].y and event.y < maprect[P_x+1][P_y].y:#event.x < gunnerX + 140 and event.x > gunnerX +43 and event.y > gunnerY + 220 and event.y < gunnerY + 320:
+            if event.x > maprect[P_x+1][P_y].x and event.x < maprect[P_x+2][P_y].x and event.y > maprect[P_x][P_y].y and event.y < maprect[P_x][P_y-1].y:
                 move6_1 = True
-            elif event.x < gunnerX + 40 and event.x > gunnerX -40 and event.y > gunnerY + 110 and event.y < gunnerY + 210:
+            elif event.x > maprect[P_x][P_y].x and event.x < maprect[P_x+1][P_y].x and event.y > maprect[P_x][P_y+1].y and event.y < maprect[P_x][P_y].y:
                 move8_1 = True
-            elif event.x < gunnerX + 40 and event.x > gunnerX -40 and event.y > gunnerY + 310 and event.y < gunnerY + 410:
+            elif P_y < 2 and event.x > maprect[P_x][P_y].x and event.x < maprect[P_x+1][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][0].y+100:
                 move2_1 = True
+            elif P_y >= 2 and event.x > maprect[P_x][P_y].x and event.x < maprect[P_x+1][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][P_y-2].y:
+                move2_1 = True
+            elif P_x < 2 and event.x > maprect[0][P_y].x and event.x < maprect[1][P_y].x and event.y > maprect[P_x][P_y].y and event.y < maprect[P_x][P_y-1].y:
+                move4_1 = True
+            elif P_x >= 2 and event.x > maprect[P_x-1][P_y].x and event.x < maprect[P_x][P_y].x and event.y > maprect[P_x][P_y].y and event.y < maprect[P_x][P_y-1].y:
+                move4_1 = True
+
+
+
+
 
 # 마우스 버튼이 눌릴 좌표를 확인해서 이벤트에 if로 넣어 버리면 부분 클릭 가능
 # 마우스 이벤트의 Y 좌표는 화면 꼭대기에서 시작하므로 gunnerY에다가 220을 더해야 쓸 수 있음
@@ -141,6 +154,17 @@ while running == True:
             P_y = P_y + 1
             move8_1 = False
             move = False
+        elif move4_1 == True:
+            gunnerX = gunnerX - 100
+
+            P_x = P_x - 1
+            move4_1 = False
+            move = False
+        elif move2_1 == True:
+            gunnerY = gunnerY - 100
+            P_y = P_y - 1
+            move2_1 = False
+            move = False
 
 
 
@@ -160,6 +184,7 @@ while running == True:
     ground.draw()
     gunner.draw()
     UI.draw()
+
 
     update_canvas()
     clear_canvas()
