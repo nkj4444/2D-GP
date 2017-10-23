@@ -6,9 +6,7 @@ import random
 import ai_boy_IQ10
 import numbers
 import json
-
-
-
+import get_frame_time_rate
 
 def handle_events():
     global running
@@ -104,16 +102,13 @@ def handle_events():
                     selectedboy.state = 3
 
 
-
-
-
 def main():
     global boy, grass, selectedboy, team, running
 
 
 
 
-    open_canvas()
+    open_canvas(sync=True)
     boy = Boy()
     grass = Grass()
 
@@ -148,8 +143,10 @@ def create_team():
 
 
 
+current_time = get_time()
+
 def enter():
-    global boy, grass, selectedboy, team, selectboyindex, selectindex
+    global boy, grass, selectedboy, team, selectboyindex, selectindex,frame_time
     boy = Boy()
     grass = Grass()
     maxboy = 10
@@ -165,9 +162,12 @@ def enter():
     selectedboy = team[0]
     running = True
     while running:
+
         handle_events()
+        frame_time = get_frame_time_rate.FPS()
+
         for boy in team:
-            boy.update()
+            boy.update(frame_time)
 
         clear_canvas()
         grass.draw()
@@ -201,8 +201,20 @@ def exit():
 
 if __name__ == '__main__':
     main()
-
+""
 class Boy:
+
+   PIXEL_PER_METER = (10.0 / 0.3)      # 10 pixel 30 cm
+   RUN_SPEED_KMPH = 20.0
+   RUN_SPEED_MPM = (RUN_SPEED_KMPH * 1000.0 / 60.0)
+   RUN_SPEED_MPS = (RUN_SPEED_MPM / 60.0)
+   RUN_SPEED_PPS = (RUN_SPEED_MPS * PIXEL_PER_METER)
+
+   TIME_PER_ACTION = 0.5
+   ACTION_PER_TIME = 1.0 / TIME_PER_ACTION
+   FRAMES_PER_ACTION = 8
+   total_frames = 0
+
    image = None
 
 
@@ -219,26 +231,35 @@ class Boy:
       if Boy.image == None:
         Boy.image = load_image('animation_sheet.png')
 
-   def update(self):
+   def update(self, frame_time):
+
+       distance = Boy.RUN_SPEED_PPS * frame_time
+       self.total_frames += Boy.FRAMES_PER_ACTION * Boy.ACTION_PER_TIME * frame_time
+       self.frame = int(self.total_frames) % 8
+
+       if self.state == self.RIGHT_RUN or self.state == self.LEFT_RUN:
+           self.x += (self.dir * distance)
+
+
        if self.state == self.RIGHT_RUN:
-           self.frame = (self.frame + 1) % 8
+           self.dir = 1
+           #self.frame = (self.frame + 1) % 8
            ai_boy_IQ10.handle_right_run(self)
 
        elif self.state == self.LEFT_RUN:
-           self.frame = (self.frame + 1) % 8
+           self.dir = -1
+           #self.frame = (self.frame + 1) % 8
            ai_boy_IQ10.handle_left_run(self)
        elif self.state == self.LEFT_STAND:
-           self.frame = (self.frame + 1) % 8
+           #self.frame = (self.frame + 1) % 8
            ai_boy_IQ10.handle_left_stand(self)
        elif self.state == self.RIGHT_STAND:
-           self.frame = (self.frame + 1) % 8
+           #self.frame = (self.frame + 1) % 8
            ai_boy_IQ10.handle_right_stand(self)
 
 
    def draw(self):
       self.image.clip_draw(self.frame*100, self.state * 100, 100, 100, self.x, self.y)
-
-
 
 
 
