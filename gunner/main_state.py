@@ -2,9 +2,11 @@ from pico2d import *
 import pico2d
 import game_framework
 import numbers
+import enemy
+import random
 
 
-open_canvas(1400,1000)
+open_canvas(1600,1000)
 running = True
 move6_1, move8_1,move4_1,move2_1,move7_1,move9_1,move1_1,move3_1,move6_2, move8_2,move4_2,move2_2,move7_2,move9_2,move1_2,move3_2 = False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
 move = False
@@ -151,8 +153,12 @@ def turn_change():
     if turn == 1:
         turn = 2
     elif turn == 2:
+        turn = 3
+
+    elif turn == 3:
         turn = 1
-        print(P_x, P_y-3)#바뀐위치
+
+        print(P_x, P_y - 3)  # 바뀐위치
 
 
 #턴은 3 까지 해서 1 = 플레이어, 2 = 적ai, 3 = 움직임 이렇게 해야 할듯
@@ -204,6 +210,83 @@ class Gunner:
        self.image.draw(gunnerX, gunnerY)
 
 
+class Enemy:
+
+    global turn
+
+    x = 1060
+    y = 490
+    p_x=9
+    p_y=4
+
+    hp = 10
+    ep = 10
+    damage = 2
+    speed = 1
+    ATTACK = 1
+    SEARCH = 2
+    REROADING = 3
+    REST = 4
+
+    move = True
+    attack = False
+    rest = False
+    reroading = False
+
+    run_stack = [None for i in range(5)]
+
+
+
+
+    state = SEARCH
+
+    def enemy_ai(self):
+        lessposition = min(self.p_x,P_x)
+        biggerposition = max(self.p_x,P_x)
+        interval = biggerposition-lessposition
+
+        if interval < 3:
+            self.state = self.ATTACK
+            self.attack = True
+        if self.state == self.SEARCH:
+            if self.move == True and turn == 3:
+                if self.p_x > P_x and (self.p_x - P_x) != 1 and (self.p_x - P_x) != -1: # x만 해놓음
+                    self.p_x -= 1
+                    self.x -= 100
+                elif self.p_x < P_x:
+                    self.p_x += 1
+                    self.x += 100
+            self.move == False
+        if self.state == self.ATTACK:
+            global player_hp
+
+
+            #self.image.clip_draw(100, 0, 100, 100, cursor_x, cursor_y, 100, 100)
+            self.testimage=load_image('cursor.png')
+            if self.attack == True:
+                #self.image.clip_draw(100, 0, 100, 100,maprect[P_x + random.randint(-1, 1)][P_x + random.randint(-1, 1)].x,maprect[P_x + random.randint(-1, 1)][P_x + random.randint(-1, 1)].y, 100, 100)
+
+                if random.randint(0, 1) == 0:  #반반확률로 맞음 그림 추가필요
+                    player_hp -= 1
+            self.attack == False
+    print(x , y)
+
+
+
+
+
+
+
+
+
+
+    def __init__(self):
+        self.image = load_image('gunner.png')
+
+    def draw(self):
+        self.image.draw(self.x, self.y)
+
+
 class Ground:
 
 
@@ -233,8 +316,10 @@ gunner = Gunner()
 UI = UserInterface()
 ground = Ground()
 map = Map()
+enemy = Enemy()
 m_cursor = Mousecursor()
 p_bar = Point_bar()
+
 
 while running == True:
 
@@ -301,19 +386,29 @@ while running == True:
 # 움직임 테스트용 move가 True인 상태에서 턴이 2(행동턴인 3으로 바꿔야함)가 되면
 
 
-
 # 플레이어의 위치를 이동시키고 move를 False로 변경
     if turn == 1:
         handle_events()
     elif turn ==2:
-        delay(2)
+        delay(1)
+
+        turn_change()
+    elif turn == 3:
+        enemy.enemy_ai()
+        delay(1)
         turn_change()
 
     #ground.draw()
     map.draw()
     p_bar.draw_HP()
     p_bar.draw_EP()
+
+
+
     gunner.draw()
+    enemy.draw()
+
+
     #UI.draw()
     numbers.draw(turn, 450, 250, 1)  # 턴 나타내는 숫자. 테스트용
     if mouse_cursor_change == True:
