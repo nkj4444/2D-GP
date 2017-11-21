@@ -2,15 +2,18 @@ from pico2d import *
 import pico2d
 import game_framework
 import numbers
-import enemy
+
 import random
 
 
-open_canvas(1600,1000)
+open_canvas(1400,1000)
 running = True
 move6_1, move8_1,move4_1,move2_1,move7_1,move9_1,move1_1,move3_1,move6_2, move8_2,move4_2,move2_2,move7_2,move9_2,move1_2,move3_2 = False,False,False,False,False,False,False,False,False,False,False,False,False,False,False,False
 move = False
 mouse_cursor_change = False
+
+player_move1_trigger,player_move2_trigger,player_attack_trriger,player_rest_trriger,player_hit_trigger = False,False,False,False,False
+enemy_move1_trigger,enemy_move2_trigger,enemy_attack_trigger,enemy_rest_trigger,enemy_hit_trigger = False,False,False,False,False
 
 gunnerX = 60
 gunnerY = 490
@@ -40,6 +43,9 @@ P_y = 4
 
 events = get_events()
 
+
+
+
 def handle_events():
     global running
     global x
@@ -48,6 +54,7 @@ def handle_events():
     global move6_1, move8_1,move4_1,move2_1,move7_1,move9_1,move1_1,move3_1,move6_2, move8_2,move4_2,move2_2,move7_2,move9_2,move1_2,move3_2
     global rect1
     global cursor_x, cursor_y,mouse_cursor_change
+    global player_move1_trigger
 
     events = get_events()
     for event in events:
@@ -82,50 +89,62 @@ def handle_events():
 
             if event.x > maprect[P_x+1][P_y].x and event.x < maprect[P_x+2][P_y].x and event.y > maprect[P_x][P_y].y and event.y < maprect[P_x][P_y-1].y:
                 move6_1 = True
+                player_move1_trigger = True
                 move8_1, move4_1, move2_1, move7_1, move9_1, move1_1, move3_1 = False,False,False,False,False,False,False
                 mouse_cursor_change = False
             elif event.x > maprect[P_x][P_y].x and event.x < maprect[P_x+1][P_y].x and event.y > maprect[P_x][P_y+1].y and event.y < maprect[P_x][P_y].y:
                 move8_1 = True
+                player_move1_trigger = True
                 move6_1, move4_1, move2_1, move7_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_y < 2 and event.x > maprect[P_x][P_y].x and event.x < maprect[P_x+1][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][0].y+100:
                 move2_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move7_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_y >= 2 and event.x > maprect[P_x][P_y].x and event.x < maprect[P_x+1][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][P_y-2].y:
                 move2_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move7_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_x < 2 and event.x > maprect[0][P_y].x and event.x < maprect[1][P_y].x and event.y > maprect[P_x][P_y].y and event.y < maprect[P_x][P_y-1].y:
                 move4_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move2_1, move7_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_x >= 2 and event.x > maprect[P_x-1][P_y].x and event.x < maprect[P_x][P_y].x and event.y > maprect[P_x][P_y].y and event.y < maprect[P_x][P_y-1].y:
                 move4_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move2_1, move7_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif event.x > maprect[P_x+1][P_y].x and event.x < maprect[P_x+2][P_y].x and event.y > maprect[P_x][P_y+1].y and event.y < maprect[P_x][P_y].y:
                 move9_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move2_1, move7_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif event.x > maprect[P_x+1][P_y].x and event.x < maprect[P_x+2][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][P_y-2].y:
                 move3_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move2_1, move7_1, move9_1, move1_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_x < 2 and event.x > maprect[0][P_y].x and event.x < maprect[1][P_y].x and event.y > maprect[P_x][P_y+1].y and event.y < maprect[P_x][P_y].y:
                 move7_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move2_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_x >= 2 and event.x > maprect[P_x-1][P_y].x and event.x < maprect[P_x][P_y].x and event.y > maprect[P_x][P_y+1].y and event.y < maprect[P_x][P_y].y:
                 move7_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move2_1, move9_1, move1_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_x < 2 and event.x > maprect[0][P_y].x and event.x < maprect[1][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][P_y-2].y:
                 move1_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move2_1, move7_1, move9_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
             elif P_x >= 2 and event.x > maprect[P_x-1][P_y].x and event.x < maprect[P_x][P_y].x and event.y > maprect[P_x][P_y-1].y and event.y < maprect[P_x][P_y-2].y:
                 move1_1 = True
+                player_move1_trigger = True
                 move6_1, move8_1, move4_1, move2_1, move7_1, move9_1, move3_1 = False, False, False, False, False, False, False
                 mouse_cursor_change = False
         elif event.type == SDL_MOUSEMOTION:
@@ -149,7 +168,6 @@ def turn_change():
     global move
 
 
-
     if turn == 1:
         turn = 2
     elif turn == 2:
@@ -168,6 +186,7 @@ class UserInterface:
 
     def __init__(self):
         self.image = load_image('button_test.png')
+        self.hit_image = load_image('hit.png')
 
     def draw(self):
         self.image.clip_draw(0, 0, 100, 40, 100, 350, 100, 30)
@@ -175,13 +194,19 @@ class UserInterface:
         self.image.clip_draw(0, 80, 100, 40, 100, 450, 100, 30)
         ##(x가시작되는위치,y가시작되는위치,표시할넓이,표시할높이,x좌표,y좌표,x축스케일,y축스케일)
 
+
+
+
+
 class Point_bar:
     def __init__(self):
         self.image = load_image('point_bar.png')
     def draw_HP(self):
         self.image.clip_draw(0, 50, 300, 50, 1015+(35/2)*player_hp, 195, 35*player_hp, 100)
+        numbers.draw(player_hp, 1200, 245, 0.7)
     def draw_EP(self):
         self.image.clip_draw(0, 0, 300, 50, 1015+(35/2)*player_ep, 95, 35*player_ep, 100)
+        numbers.draw(player_ep, 1200, 145, 0.7)
 
 
 class Mousecursor:
@@ -213,6 +238,7 @@ class Gunner:
 class Enemy:
 
     global turn
+    global enemy_attack_trigger,enemy_hit_trigger,enemy_move1_trigger,enemy_move2_trigger,enemy_rest_trigger
 
     x = 1060
     y = 490
@@ -240,25 +266,26 @@ class Enemy:
 
     state = SEARCH
 
-    def enemy_ai(self):
-        lessposition = min(self.p_x,P_x)
-        biggerposition = max(self.p_x,P_x)
-        interval = biggerposition-lessposition
+    def enemy_move1(self):
+        global enemy_move1_trigger
 
-        if interval < 3:
-            self.state = self.ATTACK
-            self.attack = True
-        if self.state == self.SEARCH:
-            if self.move == True and turn == 3:
-                if self.p_x > P_x and (self.p_x - P_x) != 1 and (self.p_x - P_x) != -1: # x만 해놓음
-                    self.p_x -= 1
-                    self.x -= 100
-                elif self.p_x < P_x:
-                    self.p_x += 1
-                    self.x += 100
-            self.move == False
+        if self.move == True and turn == 3:
+            if self.p_x > P_x and (self.p_x - P_x) != 1 and (self.p_x - P_x) != -1: # x만 해놓음
+                self.p_x -= 1
+                self.x -= 100
+            elif self.p_x < P_x:
+                self.p_x += 1
+                self.x += 100
+
+        self.move == False
+        enemy_move1_trigger = False
+
+
+    def enemy_attack(self):
+        global enemy_attack_trigger
         if self.state == self.ATTACK:
             global player_hp
+            global player_hit_trigger
 
 
             #self.image.clip_draw(100, 0, 100, 100, cursor_x, cursor_y, 100, 100)
@@ -268,23 +295,38 @@ class Enemy:
 
                 if random.randint(0, 1) == 0:  #반반확률로 맞음 그림 추가필요
                     player_hp -= 1
+                    player_hit_trigger = True
+
             self.attack == False
+            self.state = self.SEARCH
+            enemy_attack_trigger = False
+
+
+
+    def enemy_ai(self):
+        global enemy_attack_trigger, enemy_hit_trigger, enemy_move1_trigger, enemy_move2_trigger, enemy_rest_trigger
+        lessposition = min(self.p_x,P_x)
+        biggerposition = max(self.p_x,P_x)
+        interval = biggerposition-lessposition   #플레이어와 적 사이의 거리(칸수)를 interval로 설정
+        if interval >= 3:
+            self.statae = self.SEARCH
+            enemy_move1_trigger = True
+        elif interval < 3:
+            self.state = self.ATTACK
+            self.attack = True
+            enemy_attack_trigger = True
+        if self.ep == 0:
+            self.state = self.REST
+            enemy_rest_trigger = True
+
     print(x , y)
 
 
-
-
-
-
-
-
-
-
     def __init__(self):
-        self.image = load_image('gunner.png')
+        self.image = load_image('enemy.png')
 
     def draw(self):
-        self.image.draw(self.x, self.y)
+        self.image.draw(self.x-10, self.y)
 
 
 class Ground:
@@ -312,22 +354,11 @@ class Map:
        self.image.draw(700, 500)
 
 
-gunner = Gunner()
-UI = UserInterface()
-ground = Ground()
-map = Map()
-enemy = Enemy()
-m_cursor = Mousecursor()
-p_bar = Point_bar()
+def player_move():
+    global move,move6_1, move8_1,move4_1,move2_1,move7_1,move9_1,move1_1,move3_1,move6_2, move8_2,move4_2,move2_2,move7_2,move9_2,move1_2,move3_2
+    global gunnerX,gunnerY,P_x,P_y,player_move1_trigger
 
-
-while running == True:
-
-
-
-
-    if turn == 2 and move == True:
-
+    if turn == 3 and move == True:
         if move6_1 == True:
             gunnerX = gunnerX + 100
             P_x = P_x + 1
@@ -376,14 +407,66 @@ while running == True:
             P_y = P_y - 1
             move1_1 = False
             move = False
+    player_move1_trigger = False
 
 
 
 
 
+
+gunner = Gunner()
+UI = UserInterface()
+ground = Ground()
+map = Map()
+enemy = Enemy()
+m_cursor = Mousecursor()
+p_bar = Point_bar()
+
+object_num = 8
+
+hit_frame = 0
+action_list = list(range(4 * object_num)) #8명분 4*명/5로 수정해야함
+
+def action():
+    global action_list
+
+    for i in range(object_num*4):
+        if action_list[i] != None:
+            action_list[i]
+
+
+
+
+
+
+
+def actionlisting():
+    global action_list
+    for i in range(object_num*4):
+        action_list[i] = None
+
+    if player_move1_trigger == True:
+        action_list[0] = player_move()
+    else:
+        action_list[0] = None
+    if enemy_move1_trigger == True:
+        action_list[1] = enemy.enemy_move1()
+    else:
+        action_list[1] = None
+
+
+
+    if enemy_attack_trigger == True:
+        action_list[3] = enemy.enemy_attack()
+    else:
+        action_list[3] = None
+
+
+while running == True:
 
 
 # 움직임 테스트용 move가 True인 상태에서 턴이 2(행동턴인 3으로 바꿔야함)가 되면
+
 
 
 # 플레이어의 위치를 이동시키고 move를 False로 변경
@@ -391,11 +474,14 @@ while running == True:
         handle_events()
     elif turn ==2:
         delay(1)
+        enemy.enemy_ai()
 
         turn_change()
     elif turn == 3:
-        enemy.enemy_ai()
-        delay(1)
+        delay(0.5)
+        actionlisting()
+        action()
+
         turn_change()
 
     #ground.draw()
@@ -405,12 +491,22 @@ while running == True:
 
 
 
+
     gunner.draw()
     enemy.draw()
+
+    if player_hit_trigger == True and hit_frame < 120:
+        load_image('hit.png').draw(gunnerX,gunnerY)    # hitframe으로 그릴 시간조정, hit_trigger활성시 발동. 맞는 이펙트 그리기
+        hit_frame += 1
+    else:
+        hit_frame = 0
+        player_hit_trigger = False
+
 
 
     #UI.draw()
     numbers.draw(turn, 450, 250, 1)  # 턴 나타내는 숫자. 테스트용
+
     if mouse_cursor_change == True:
         m_cursor.move_cursor()
 
